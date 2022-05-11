@@ -43,7 +43,6 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         	tabLabel[node.getId()] = new Label(node, false, null);
         } 
         
-        tabLabel[data.getOrigin().getId()] = new Label (data.getOrigin(), true, data.getOrigin());
         tabLabel[data.getOrigin().getId()].setCost(0);
         
         BinaryHeap<Label> heapLabel = new BinaryHeap<Label>();
@@ -52,13 +51,13 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         }
         
         boolean destinationReached = false;
-		        
+        System.out.println(data.getDestination().getId());
+
         while(!isAllMarkedTrue(tabLabel) && !destinationReached) {
         	//Dijkstra en distance
         	if(data.getMode() == AbstractInputData.Mode.LENGTH) {
         		Label labelMin = heapLabel.findMin();
             	labelMin.setMarque(true);
-            	
             	//The node has been marked, notify the observers
             	notifyNodeMarked(labelMin.getSommetCourant());
             	
@@ -66,9 +65,8 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             	for (Arc arc : labelMin.getSommetCourant().getSuccessors()) {
             		if(data.isAllowed(arc)) {
             			Label labelCourant = tabLabel[arc.getDestination().getId()];
-                		
+            			
                 		if(labelCourant.getCost()>labelMin.getCost()+arc.getLength()) {
-                			
                 			//Pour effectuer le changement dans le tas, on remove, on modifie puis on insert
                 			heapLabel.remove(labelCourant);
                 			labelCourant.setCost(labelMin.getCost()+arc.getLength());

@@ -2,11 +2,14 @@ package org.insa.graphs.gui.simple;
 
 import org.insa.graphs.model.io.BinaryPathReader;
 
+import static org.junit.Assert.assertEquals;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -14,7 +17,10 @@ import javax.swing.SwingUtilities;
 
 import org.insa.graphs.algorithm.ArcInspector;
 import org.insa.graphs.algorithm.ArcInspectorFactory;
+import org.insa.graphs.algorithm.shortestpath.BellmanFordAlgorithm;
+import org.insa.graphs.algorithm.shortestpath.DijkstraAlgorithm;
 import org.insa.graphs.algorithm.shortestpath.ShortestPathData;
+import org.insa.graphs.algorithm.shortestpath.ShortestPathSolution;
 import org.insa.graphs.gui.drawing.Drawing;
 import org.insa.graphs.gui.drawing.components.BasicDrawing;
 import org.insa.graphs.model.Graph;
@@ -23,6 +29,8 @@ import org.insa.graphs.model.Path;
 import org.insa.graphs.model.io.BinaryGraphReader;
 import org.insa.graphs.model.io.GraphReader;
 import org.insa.graphs.model.io.PathReader;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class Launch {
 
@@ -33,6 +41,27 @@ public class Launch {
      * 
      * @throws Exception if something wrong happens when creating the graph.
      */
+	
+	private static int Origin_int;
+	private static int Destination_int;
+    private static int numInspector;
+    
+    private static Node Origin;
+    private static Node Destination;
+    
+    private static List <ArcInspector> listInspector;
+    private static ArcInspector arcInspector;
+    
+    private static ShortestPathData data;
+    
+    private static BellmanFordAlgorithm bellManAlgo;
+    private static DijkstraAlgorithm dijkstraAlgo;
+    
+    private static ShortestPathSolution solutionBellMan;
+    private static ShortestPathSolution solutionDijkstra;
+    
+    
+    
     public static Drawing createDrawing() throws Exception {
         BasicDrawing basicDrawing = new BasicDrawing();
         SwingUtilities.invokeAndWait(new Runnable() {
@@ -50,7 +79,8 @@ public class Launch {
         return basicDrawing;
     }
     
-    public static void main(String[] args) throws Exception {
+    @BeforeClass
+    public static void initAll() throws Exception {
 
         // Visit these directory to see the list of available files on Commetud.
         final String mapName = "/home/agbeti-m/Documents/BE Graphes/Maps/insa.mapgr";
@@ -80,19 +110,43 @@ public class Launch {
 		//        drawing.drawPath(path);
         
         //Test avec Bellman-Ford
-        int Origin_int =  0;
-        int Destination_int =  0;
-        int numInspector = 0;
+        Origin_int =  0;
+        Destination_int =  5;
+        numInspector = 0;
         
-        Node Origin = new Node(Origin_int, null);
-        Node Destination = new Node(Destination_int, null);
+        Origin = new Node(Origin_int, null);
+        Destination = new Node(Destination_int, null);
         
-        List <ArcInspector> listInspector = new ArcInspectorFactory().getAllFilters();
-        ArcInspector arcInspector = listInspector.get(numInspector);
+        System.out.println(Origin.hasSuccessors());
         
-        ShortestPathData data = new ShortestPathData(graph, Origin, Destination, arcInspector);
+        listInspector = new ArcInspectorFactory().getAllFilters();
+        arcInspector = listInspector.get(numInspector);
+        System.out.println(arcInspector.toString());
+        
+        data = new ShortestPathData(graph, Origin, Destination, arcInspector);
+        
+        
+        
         //0 continuer ici: on vient de créer un data pour mettre en paramètre de bellman et dijkstra
         
+        dijkstraAlgo = new DijkstraAlgorithm(data);
+        bellManAlgo = new BellmanFordAlgorithm(data);
+        
+        solutionDijkstra = dijkstraAlgo.run();
+        solutionBellMan = bellManAlgo.run();
+        
+        
+        System.out.println(solutionDijkstra.getStatus());
+        System.out.println(solutionBellMan.getPath().getLength());
+        System.out.println(solutionDijkstra.getPath().getLength());
     }
+    
+	@Test
+    public void Test1() throws IOException {
+    	
+    	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
+    	
+    }
+    
 
 }
