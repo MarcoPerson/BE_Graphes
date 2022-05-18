@@ -17,6 +17,7 @@ import javax.swing.SwingUtilities;
 
 import org.insa.graphs.algorithm.ArcInspector;
 import org.insa.graphs.algorithm.ArcInspectorFactory;
+import org.insa.graphs.algorithm.shortestpath.AStarAlgorithm;
 import org.insa.graphs.algorithm.shortestpath.BellmanFordAlgorithm;
 import org.insa.graphs.algorithm.shortestpath.DijkstraAlgorithm;
 import org.insa.graphs.algorithm.shortestpath.ShortestPathData;
@@ -32,7 +33,7 @@ import org.insa.graphs.model.io.PathReader;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class Launch {
+public class LaunchStar {
 
     /**
      * Create a new Drawing inside a JFrame an return it.
@@ -56,9 +57,11 @@ public class Launch {
     
     private static BellmanFordAlgorithm bellManAlgo;
     private static DijkstraAlgorithm dijkstraAlgo;
+    private static AStarAlgorithm aStarAlgo;
     
     private static ShortestPathSolution solutionBellMan;
     private static ShortestPathSolution solutionDijkstra;
+    private static ShortestPathSolution solutionAStar;
     
     private static Graph graph = null;
     
@@ -124,9 +127,11 @@ public class Launch {
         
         dijkstraAlgo = new DijkstraAlgorithm(data);
         bellManAlgo = new BellmanFordAlgorithm(data);
+        aStarAlgo = new AStarAlgorithm(data);
         
         solutionDijkstra = dijkstraAlgo.run();
         solutionBellMan = bellManAlgo.run();
+        solutionAStar = aStarAlgo.run();
         
     }
 	@Test

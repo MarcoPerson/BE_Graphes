@@ -9,6 +9,7 @@ import org.insa.graphs.algorithm.utils.BinaryHeap;
 import org.insa.graphs.model.Arc;
 import org.insa.graphs.model.Graph;
 import org.insa.graphs.model.Label;
+import org.insa.graphs.model.LabelStar;
 import org.insa.graphs.model.Node;
 import org.insa.graphs.model.Path;
 
@@ -16,7 +17,9 @@ import java.util.Collections;
 
 
 public class DijkstraAlgorithm extends ShortestPathAlgorithm {
-
+	
+	protected static Label[] tabLabel = null;
+	protected static Graph graph = null;
 
 	public DijkstraAlgorithm(ShortestPathData data) {
         super(data);
@@ -25,10 +28,10 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
     @Override
     protected ShortestPathSolution doRun() {
         final ShortestPathData data = getInputData();
-        Graph graph = data.getGraph();
+        graph = data.getGraph();
         final int nbNodes = graph.size();
         
-        System.out.println("MODE :"+data.getMode());
+        //System.out.println("MODE :"+data.getMode());
         
         // Notify observers about the first event (origin processed).
         notifyOriginProcessed(data.getOrigin());
@@ -37,35 +40,55 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         Arc[] arcSuccessors = new Arc[nbNodes];
         
         //Initialize array of label 
-        Label[] tabLabel = new Label[nbNodes];
+        tabLabel = new Label[nbNodes];
         
-        for(Node node : graph.getNodes()) {
-        	tabLabel[node.getId()] = new Label(node, false, null);
-        } 
+        initTabLabel();
         
         tabLabel[data.getOrigin().getId()].setCost(0);
         
+        //Creation du tas
         BinaryHeap<Label> heapLabel = new BinaryHeap<Label>();
-        for (Label label : tabLabel) {
-        	heapLabel.insert(label);
-        }
+//        for (Label label : tabLabel) {
+//        	heapLabel.insert(label);
+//        }
+        
+        //Mise du depart dans le tas
+        heapLabel.insert(tabLabel[data.getOrigin().getId()]);
+        
+        
         
         boolean destinationReached = false;
-        System.out.println(data.getDestination().getId());
-
-        while(!isAllMarkedTrue(tabLabel) && !destinationReached) {
+        //System.out.println(data.getDestination().getId());
+        
+        while(!isAllMarkedTrue(tabLabel) && !destinationReached && !heapLabel.isEmpty()) {
         	//Dijkstra en distance
         	if(data.getMode() == AbstractInputData.Mode.LENGTH) {
+        		
+        		//labelMin
         		Label labelMin = heapLabel.findMin();
             	labelMin.setMarque(true);
+            	heapLabel.remove(labelMin);
+            	
             	//The node has been marked, notify the observers
             	notifyNodeMarked(labelMin.getSommetCourant());
             	
-            	heapLabel.remove(labelMin);
+            	//Insert the successor in the heap if not already in
+            	for(Arc arc : labelMin.getSommetCourant().getSuccessors()) {
+            		Node nodeSuc = arc.getDestination();
+            		if(!tabLabel[nodeSuc.getId()].getInserted() && !tabLabel[nodeSuc.getId()].getMarque()) {
+            			heapLabel.insert(tabLabel[nodeSuc.getId()]);
+            			tabLabel[nodeSuc.getId()].setInserted(true);
+            		}
+            	}
+            	
+            	
             	for (Arc arc : labelMin.getSommetCourant().getSuccessors()) {
-            		if(data.isAllowed(arc)) {
+            		if(data.isAllowed(arc) && !tabLabel[arc.getDestination().getId()].getMarque()) {
             			Label labelCourant = tabLabel[arc.getDestination().getId()];
             			
+            			if(!labelCourant.getInserted() || labelCourant.getMarque()) {
+            				System.exit(-1);
+            			}
                 		if(labelCourant.getCost()>labelMin.getCost()+arc.getLength()) {
                 			//Pour effectuer le changement dans le tas, on remove, on modifie puis on insert
                 			heapLabel.remove(labelCourant);
@@ -82,20 +105,38 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                 		}
             		}
             	}
+            	
         	}
         	//Dijkstra en temps
         	else if(data.getMode() == AbstractInputData.Mode.TIME){
+        		
+        		//labelMin
         		Label labelMin = heapLabel.findMin();
             	labelMin.setMarque(true);
+            	heapLabel.remove(labelMin);
+            	//System.out.println(labelMin.getSommetCourant().getId());
+            	
             	
             	//The node has been marked, notify the observers
             	notifyNodeMarked(labelMin.getSommetCourant());
             	
-            	heapLabel.remove(labelMin);
+            	for(Arc arc : labelMin.getSommetCourant().getSuccessors()) {
+            		Node nodeSuc = arc.getDestination();
+            		if(!tabLabel[nodeSuc.getId()].getInserted() && !tabLabel[nodeSuc.getId()].getMarque()) {
+            			heapLabel.insert(tabLabel[nodeSuc.getId()]);
+            			tabLabel[nodeSuc.getId()].setInserted(true);
+            		}
+            	}
+            	
+            	
             	for (Arc arc : labelMin.getSommetCourant().getSuccessors()) {
-            		if(data.isAllowed(arc)) {
+            		if(data.isAllowed(arc) && !tabLabel[arc.getDestination().getId()].getMarque()) {
             			Label labelCourant = tabLabel[arc.getDestination().getId()];
-                		
+            			
+            			if(!labelCourant.getInserted() || labelCourant.getMarque()) {
+            				System.exit(-1);
+            			}
+            			
                 		if(labelCourant.getCost()>labelMin.getCost()+arc.getMinimumTravelTime()) {
                 			
                 			//Pour effectuer le changement dans le tas, on remove, on modifie puis on insert
@@ -113,6 +154,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                 		}
             		}
             	}
+            	
         	}
         	
         }
@@ -151,5 +193,11 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
     	}
     	return true ;
     }
+    
+    public void initTabLabel(){
+    	for(Node node : graph.getNodes()) {
+        	tabLabel[node.getId()] = new Label(node, false, null);
+        } 
+   }
 
 }

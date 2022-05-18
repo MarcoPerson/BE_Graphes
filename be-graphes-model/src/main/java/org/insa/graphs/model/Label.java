@@ -5,16 +5,22 @@ public class Label implements Comparable<Label>{
 	private boolean marque ;
 	private double cout;
 	private Node pere;
+	private boolean isInserted;
 	
 	public Label(Node sommetCourant, boolean marque, Node pere) {
 		this.setSommetCourant(sommetCourant);
 		this.setMarque(marque);
 		this.cout = Double.POSITIVE_INFINITY;
 		this.setPere(pere);
+		this.setInserted(false);
 	}
 	
 	public double getCost() {
 		return this.cout;
+	}
+	
+	public double getTotalCost() {
+		return this.getCost();
 	}
 	
 	public boolean getMarque() {
@@ -31,9 +37,9 @@ public class Label implements Comparable<Label>{
 	
 	public int compareTo(Label autre) {
 		int result;
-		if(this.cout == autre.getCost()){
+		if(this.getTotalCost() == autre.getTotalCost()){
 			result = 0;
-		} else if( this.cout >autre.getCost()){
+		} else if( this.getTotalCost() > autre.getTotalCost()){
 			result = 1;
 		}else{
 			result = -1;
@@ -56,5 +62,18 @@ public class Label implements Comparable<Label>{
 	public void setPere(Node pere) {
 		this.pere = pere;
 	}
+	
+	public void setInserted(boolean isIn) {
+		this.isInserted = isIn ; 
+	}
+	
+	public boolean getInserted() {
+		return this.isInserted; 
+	}
+
+	public double getCoutDestination() {
+		return 0;
+	}
+
 
 }
