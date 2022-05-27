@@ -60,7 +60,9 @@ public class Launch {
     private static ShortestPathSolution solutionBellMan;
     private static ShortestPathSolution solutionDijkstra;
     
-    private static Graph graph = null;
+    private static Graph graphINSA = null;
+    private static Graph graphMadagascar = null;
+    private static Graph graphBelgium = null;
     
     public static Drawing createDrawing() throws Exception {
         BasicDrawing basicDrawing = new BasicDrawing();
@@ -83,15 +85,24 @@ public class Launch {
     public static void initAll() throws Exception {
 
         // Visit these directory to see the list of available files on Commetud.
-        final String mapName = "/home/agbeti-m/Documents/BE Graphes/Maps/insa.mapgr";
-        final String pathName = "/mnt/commetud/3eme Annee MIC/Graphes-et-Algorithmes/Paths/path_fr31insa_rangueil_r2.path";
+        final String mapINSA = "/home/agbeti-m/Documents/BE Graphes/Maps/insa.mapgr";
+        final String mapBelgium = "/home/agbeti-m/Documents/BE Graphes/Maps/belgium.mapgr";
+        final String mapMadagascar = "/home/agbeti-m/Documents/BE Graphes/Maps/madagascar.mapgr";
+        //final String pathName = "/mnt/commetud/3eme Annee MIC/Graphes-et-Algorithmes/Paths/path_fr31insa_rangueil_r2.path";
 
         // Create a graph reader.
-        final GraphReader reader = new BinaryGraphReader(
-                new DataInputStream(new BufferedInputStream(new FileInputStream(mapName))));
+        final GraphReader readerINSA = new BinaryGraphReader(
+                new DataInputStream(new BufferedInputStream(new FileInputStream(mapINSA))));
+        final GraphReader readerBelgium = new BinaryGraphReader(
+                new DataInputStream(new BufferedInputStream(new FileInputStream(mapBelgium))));
+        final GraphReader readerMadagascar = new BinaryGraphReader(
+                new DataInputStream(new BufferedInputStream(new FileInputStream(mapMadagascar))));
 		//
         // TODO: Read the graph.
-        graph = reader.read();
+        graphINSA = readerINSA.read();
+        graphBelgium = readerBelgium.read();
+        graphMadagascar = readerMadagascar.read();
+        
 		//
 		//        // Create the drawing:
 		//        final Drawing drawing = createDrawing();
@@ -110,7 +121,7 @@ public class Launch {
 		//        drawing.drawPath(path);
         
     }
-    public void Initializer(int Origin_param, int Destination_param, int Road) {
+    public void Initializer(int Origin_param, int Destination_param, int Road, Graph graph) {
     	Origin = new Node(Origin_param, null);
         Destination = new Node(Destination_param, null);
         
@@ -129,92 +140,104 @@ public class Launch {
         solutionBellMan = bellManAlgo.run();
         
     }
+    
+    @Test
+    public void TestOriginEqualsDestination() throws IOException {
+		Initializer(0,0,0, graphINSA);
+    	assertEquals(0 , solutionDijkstra.getPath().getLength(), 0);
+    	Initializer(69,69,0, graphINSA);
+    	assertEquals(0, solutionDijkstra.getPath().getLength(), 0);
+    }
+    
 	@Test
     public void TestShortestAllRoads() throws IOException {
-		Initializer(0,5,0);
+		Initializer(0,5,0, graphINSA);
     	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
-    	Initializer(69,344,0);
+    	Initializer(69,344,0, graphINSA);
     	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
-    	Initializer(644,518,0);
+    	Initializer(644,518,0, graphINSA);
     	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
-    	Initializer(73,1276,0);
+    	Initializer(73,1276,0, graphINSA);
     	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
-    	Initializer(187,656,0);
+    	Initializer(187,656,0, graphINSA);
     	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
     }
 	
 	
 	@Test
     public void TestShortestCarsOnly() throws IOException {
-		Initializer(253,5,1);
+		Initializer(253,5,1, graphINSA);
     	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
-    	Initializer(69,344,1);
+    	Initializer(69,344,1, graphINSA);
     	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
-    	Initializer(644,518,1);
+    	Initializer(644,518,1, graphINSA);
     	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
-    	Initializer(74,214,1);
+    	Initializer(74,214,1, graphINSA);
     	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
-    	Initializer(501,1024,1);
+    	Initializer(501,1024,1, graphINSA);
     	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
     }
 	
 	@Test
     public void TestFastestAllRoads() throws IOException {
-		Initializer(0,5,2);
+		Initializer(0,5,2, graphINSA);
     	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
-    	Initializer(69,344,2);
+    	Initializer(69,344,2, graphINSA);
     	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
-    	Initializer(644,518,2);
+    	Initializer(644,518,2, graphINSA);
     	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
-    	Initializer(73,1276,2);
+    	Initializer(73,1276,2, graphINSA);
     	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
-    	Initializer(187,656,2);
+    	Initializer(187,656,2, graphINSA);
     	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
     }
 	
 	
 	@Test
     public void TestFastestCarsOnly() throws IOException {
-		Initializer(253,5,3);
+		Initializer(253,5,3, graphINSA);
     	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
-    	Initializer(69,344,3);
+    	Initializer(69,344,3, graphINSA);
     	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
-    	Initializer(644,518,3);
+    	Initializer(644,518,3, graphINSA);
     	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
-    	Initializer(74,214,3);
+    	Initializer(74,214,3, graphINSA);
     	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
-    	Initializer(501,1024,3);
+    	Initializer(501,1024,3, graphINSA);
     	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
     }
 	
-	
-	@Test
-    public void TestFastestPedestrians() throws IOException {
-		Initializer(253,5,4);
-    	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
-    	Initializer(69,344,4);
-    	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
-    	Initializer(644,518,4);
-    	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
-    	Initializer(74,214,4);
-    	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
-    	Initializer(501,1024,4);
-    	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
-    }
 	
 	@Test
 	public void TestRoadCarsNotFound() throws IOException {
-		Initializer(0,5,0);
+		Initializer(0,5,0, graphINSA);
 		if(solutionDijkstra.getPath() != null) {
 			assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
 		}
-    	Initializer(73,1276,0);
+    	Initializer(73,1276,0, graphINSA);
     	if(solutionDijkstra.getPath() != null) {
 			assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
 		}
-    	Initializer(187,656,0);
+    	Initializer(187,656,0, graphINSA);
     	if(solutionDijkstra.getPath() != null) {
 			assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
 		}
     }
+	
+	@Test
+    public void TestShortestLongDistance() throws IOException {
+		Initializer(4574,29774,0, graphMadagascar);
+    	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
+    	Initializer(76574,36675,0, graphMadagascar);
+    	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
+	}
+	
+	@Test
+    public void TestShortestShortDistance() throws IOException {
+		Initializer(63512,621254,0, graphBelgium);
+    	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
+    	Initializer(581892,581898,0, graphBelgium);
+    	assertEquals(solutionBellMan.getPath().getLength(), solutionDijkstra.getPath().getLength(), 0);
+    }
+	
 }

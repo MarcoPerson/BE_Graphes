@@ -28,7 +28,17 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
     @Override
     protected ShortestPathSolution doRun() {
         final ShortestPathData data = getInputData();
+        
+        
         graph = data.getGraph();
+        
+        //Origin = Destination
+        if(data.getDestination().getId() == data.getOrigin().getId()) {
+        	ArrayList<Arc> arcs = new ArrayList<>();
+        	ShortestPathSolution solution = new ShortestPathSolution(data, Status.OPTIMAL, new Path(graph, arcs));
+        	return solution;
+        }
+        
         final int nbNodes = graph.size();
         
         //System.out.println("MODE :"+data.getMode());
@@ -42,10 +52,8 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         //Initialize array of label 
         tabLabel = new Label[nbNodes];
         
-        initTabLabel();
-        
-        tabLabel[data.getOrigin().getId()].setCost(0);
-        
+        initTabLabel(data);
+                
         //Creation du tas
         BinaryHeap<Label> heapLabel = new BinaryHeap<Label>();
 //        for (Label label : tabLabel) {
@@ -75,6 +83,9 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             	//Insert the successor in the heap if not already in
             	for(Arc arc : labelMin.getSommetCourant().getSuccessors()) {
             		Node nodeSuc = arc.getDestination();
+            		if(tabLabel[nodeSuc.getId()] == null) {
+            			addLabel(nodeSuc.getId(), data);
+            		}
             		if(!tabLabel[nodeSuc.getId()].getInserted() && !tabLabel[nodeSuc.getId()].getMarque()) {
             			heapLabel.insert(tabLabel[nodeSuc.getId()]);
             			tabLabel[nodeSuc.getId()].setInserted(true);
@@ -122,6 +133,9 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             	
             	for(Arc arc : labelMin.getSommetCourant().getSuccessors()) {
             		Node nodeSuc = arc.getDestination();
+            		if(tabLabel[nodeSuc.getId()] == null) {
+            			addLabel(nodeSuc.getId(), data);
+            		}
             		if(!tabLabel[nodeSuc.getId()].getInserted() && !tabLabel[nodeSuc.getId()].getMarque()) {
             			heapLabel.insert(tabLabel[nodeSuc.getId()]);
             			tabLabel[nodeSuc.getId()].setInserted(true);
@@ -187,17 +201,20 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
     
     public boolean isAllMarkedTrue(Label[] tabLabel) {
     	for(Label label : tabLabel) {
-    		if(label.getMarque() == false) {
+    		if(label != null && label.getMarque() == false) {
     			return false;
     		}
     	}
     	return true ;
     }
     
-    public void initTabLabel(){
-    	for(Node node : graph.getNodes()) {
-        	tabLabel[node.getId()] = new Label(node, false, null);
-        } 
+    public void initTabLabel(ShortestPathData data){
+    	tabLabel[data.getOrigin().getId()] = new Label(graph.getNodes().get(data.getOrigin().getId()), false, null);
+    	tabLabel[data.getOrigin().getId()].setCost(0);
    }
+    
+    public void addLabel(int id, ShortestPathData data) {
+    	tabLabel[id] = new Label(graph.getNodes().get(id), false, null);
+    }
 
 }

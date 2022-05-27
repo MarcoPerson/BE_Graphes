@@ -21,17 +21,20 @@ public class AStarAlgorithm extends DijkstraAlgorithm {
         super(data);
     }
     
-    public void initTabLabel(){
-    	final ShortestPathData data = getInputData();
-    	
+    public void initTabLabel(ShortestPathData data){
     	double distanceDestination = 0;
-    	Node destination = null;
-
-    	destination = graph.getNodes().get(data.getDestination().getId());
-		for(Node node : this.graph.getNodes()) {
-			distanceDestination = node.getPoint().distanceTo(destination.getPoint());
-			tabLabel[node.getId()] = new LabelStar(node, false, null, distanceDestination);
-		} 
+    	Node destination = graph.getNodes().get(data.getDestination().getId());
+    	Node origin = graph.getNodes().get(data.getOrigin().getId());
+    	distanceDestination = origin.getPoint().distanceTo(destination.getPoint());
+		tabLabel[origin.getId()] = new LabelStar(origin, false, null, distanceDestination);
+    	tabLabel[data.getOrigin().getId()].setCost(0);
+    }
+    
+    public void addLabel(int id, ShortestPathData data) {
+    	double distanceDestination = 0;
+    	Node destination = graph.getNodes().get(data.getDestination().getId());
+    	distanceDestination = graph.getNodes().get(id).getPoint().distanceTo(destination.getPoint());
+    	tabLabel[id] = new LabelStar(graph.getNodes().get(id), false, null, distanceDestination);
     }
 
 }
